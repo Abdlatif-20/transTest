@@ -16,8 +16,12 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Adjust this if needed for other media files
+
+STATIC_URL = "avatars/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "./avatars",
+]
 
 # Add a MEDIA_ROOT for qrcodes
 QRCODE_URL = '/qrcodes/'
@@ -52,12 +56,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'authentication',
     'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 AUTHENTICATION_BACKENDS = [
-    # 'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
@@ -82,6 +88,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_USE_SESSIONS = False  # Unless explicitly using sessions for CSRF
+CSRF_COOKIE_NAME = "csrftoken"  # Ensure this matches what you're using on the client-side
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -91,9 +103,11 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'authentication.CustomUser'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),  # Short lifetime for access token
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Short lifetime for access token
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Longer lifetime for refresh token
     'ROTATE_REFRESH_TOKENS': True,                 # Rotate refresh tokens on refresh
+    'BLACKLIST_AFTER_ROTATION': True,              # Blacklist old tokens
+    'UPDATE_LAST_LOGIN': True,                   # Update last login on token refresh
     'BLACKLIST_AFTER_ROTATION': True,              # Blacklist old tokens
 }
 
@@ -112,8 +126,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'authentication.middleware.AuthRequiredMiddleware',
+    'allauth.account.middleware.AccountMiddleware', 
+    'authentication.middleware.AuthRequiredMiddleware', 
 ]
 
 ROOT_URLCONF = 'backend.urls'

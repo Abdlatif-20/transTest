@@ -7,6 +7,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { handle42Callback } from './auth'
+import { useContext } from "react";
+
 interface SigninPageProps {
   onNavigate?: () => void;
 }
@@ -61,6 +63,20 @@ const SigninPage: React.FC<SigninPageProps> = ({ onNavigate }) => {
     }
   }, []);
 
+  const handleEnterPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSignin(event);
+    }
+  };
+
+  
+  useEffect(() => {
+    window.addEventListener('keydown', handleEnterPress);
+    return () => {
+      window.removeEventListener('keydown', handleEnterPress);
+  };
+}
+, [email, password]);
 
   return (
     <motion.form onSubmit={(e) => e.preventDefault()} 
@@ -148,9 +164,9 @@ const SigninPage: React.FC<SigninPageProps> = ({ onNavigate }) => {
               <div className="relative flex">
                 <input value={email} onChange={(e) => setEmail(e.target.value)}
                   type="email"
-                  className="border-b-[1px] border-[#949DA2] mb-7 h-[34px] w-full focus:outline-none bg-[#131E24]"
+                  className="border-b-[1px] border-[#949DA2] mb-7 h-[34px] w-full focus:outline-none bg-[#131E24] pr-6"
                 />
-                <FaEnvelope className="absolute right-0.5 text-[#949DA2]" />
+                <FaEnvelope className="absolute right-0.5 text-[#949DA2] top-1" />
               </div>
             </div>
             <PasswordHelper setPassword={setPassword} password={password}/>
